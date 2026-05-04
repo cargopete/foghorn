@@ -1,0 +1,56 @@
+deployment:
+  id: "0xde0a7b5368f846f7d863d9f64949b688ad9818243151d488b4c6b206145b9ea3"
+  ipfs_hash: "QmdHQVHirs3yPygcgo3HNttXaFCS4pnoGiMx3aKXr192En"
+  network: "arbitrum-one"
+  description: "Premia Finance (Arbitrum One)"
+  gateway_subgraph_id: "J55C6VRkMbVH6foEDR1qHtcRArMCqpCneEwLdfuGu2En"
+
+queries:
+  # ── Freshness check ──────────────────────────────────────────────────────────
+  - category: Q_freshness
+    template: |
+      {
+        _meta {
+          block { number hash timestamp }
+          deployment
+        }
+      }
+
+  # ── Aggregate: top pools by ID (deterministic ordering) ─────────────────────
+  - category: Q_agg
+    template: |
+      {
+        pools(
+          first: 30
+          orderBy: id
+          orderDirection: asc
+          block: { hash: "$block_hash" }
+        ) {
+          id
+        }
+        tokens(
+          first: 20
+          orderBy: id
+          orderDirection: asc
+          block: { hash: "$block_hash" }
+        ) {
+          id
+          symbol
+        }
+      }
+
+  # ── By-ID: specific well-known Premia pool ───────────────────────────────────
+  - category: Q_byid
+    template: |
+      {
+        pool(
+          id: "$id"
+          block: { hash: "$block_hash" }
+        ) {
+          id
+        }
+      }
+    entity_ids:
+      - "0x000057ca8027aa2d2bee62b094430affbdc191bb"
+      - "0x0001471fcbcfa841c4a6b2d600f204efa77fdf45"
+      - "0x0001bfc78af74967be89e00dc4f4cb83ea370f3a"

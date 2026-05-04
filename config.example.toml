@@ -1,0 +1,23 @@
+# Foghorn configuration — copy to config.toml and fill in your values.
+# All fields can also be set via environment: FOGHORN__FIELD_NAME (__ = nested)
+
+database_url       = "postgres://dispatch:dispatch@drpc-postgres-1:5432/foghorn"
+network_subgraph_url = "https://gateway.thegraph.com/api/YOUR_API_KEY/subgraphs/id/DZz4kDTdmzWLWsV373w2bSmoar3umKKH9y82SUKr5qmp"
+test_sets_dir      = "./test-sets"
+reorg_threshold    = 12
+max_qps_per_indexer = 0.2
+probe_interval_secs = 300
+freshness_interval_secs = 30
+api_port           = 8080
+api_host           = "0.0.0.0"
+cors_origins       = ["*"]
+
+[rpc_urls]
+"arbitrum-one" = "https://arb-mainnet.g.alchemy.com/v2/YOUR_KEY"
+"mainnet"      = "https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY"
+
+[[opted_in_indexers]]
+address    = "0xabc..."
+url        = "https://indexer-1.example.com"
+auth_token = "your-free-query-token"
+stake_grt  = "500000"
