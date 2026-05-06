@@ -1,3 +1,4 @@
+use foghorn_core::normalize::strip_volatile;
 use serde_json::Value;
 use std::collections::HashMap;
 
@@ -118,6 +119,10 @@ pub fn compute_clusters(inputs: &[ClusterInput]) -> ClusterResult {
 fn compute_diff(raw_a: &str, raw_b: &str) -> Value {
     let Ok(a) = serde_json::from_str::<Value>(raw_a) else { return Value::Array(vec![]) };
     let Ok(b) = serde_json::from_str::<Value>(raw_b) else { return Value::Array(vec![]) };
+    // Strip the same volatile fields as the hash pipeline so the diff
+    // reflects genuine data differences, not block-height noise.
+    let a = strip_volatile(a);
+    let b = strip_volatile(b);
     let patch = json_patch::diff(&a, &b);
     serde_json::to_value(patch).unwrap_or(Value::Array(vec![]))
 }

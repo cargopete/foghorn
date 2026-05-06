@@ -31,6 +31,14 @@ pub async fn run_probe_scheduler(config: FoghornConfig, pool: PgPool) -> Result<
             Ok(n) => info!(probes = n, "Probe round complete"),
             Err(e) => error!(error = %e, "Probe round failed"),
         }
+
+        // Resolve new allocation keys to real indexer addresses after each round.
+        if let Some(gw) = &config.gateway {
+            if let Err(e) = crate::resolver::resolve_allocation_keys(&pool, &gw.url, &gw.api_key).await {
+                warn!(error = %e, "Allocation key resolution failed");
+            }
+        }
+
         tokio::time::sleep(Duration::from_secs(config.probe_interval_secs)).await;
     }
 }

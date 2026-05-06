@@ -3,12 +3,18 @@ use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 
 /// Strip volatile fields before canonicalization.
-/// Removes `extensions` (subgraph metadata, timing) and `headers`.
+/// Removes `extensions` (subgraph metadata, timing), `headers`, and
+/// `data._meta` (block height — indexers are at different chainheads).
 pub fn strip_volatile(value: Value) -> Value {
     match value {
         Value::Object(mut map) => {
             map.remove("extensions");
             map.remove("headers");
+            // Strip _meta from the data envelope so block-height differences
+            // between indexers don't produce spurious hash divergence.
+            if let Some(Value::Object(ref mut data)) = map.get_mut("data") {
+                data.remove("_meta");
+            }
             Value::Object(map)
         }
         other => other,

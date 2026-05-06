@@ -432,6 +432,8 @@ pub async fn deployment_quality(
     let by_indexer = sqlx::query(
         r#"SELECT
              o.indexer_address,
+             am.indexer_address as resolved_indexer,
+             am.indexer_url,
              COUNT(DISTINCT o.probe_id) as total_probes,
              COUNT(DISTINCT CASE WHEN d.probe_id IS NOT NULL THEN o.probe_id END) as divergent_probes,
              ROUND(AVG(o.latency_ms))::int as avg_latency_ms,
@@ -439,9 +441,10 @@ pub async fn deployment_quality(
            FROM observation o
            JOIN probe p ON p.id = o.probe_id
            LEFT JOIN divergence d ON d.probe_id = o.probe_id
+           LEFT JOIN allocation_map am ON am.allocation_key = o.indexer_address
            WHERE p.deployment_id = $1
              AND p.dispatched_at > NOW() - $2::interval
-           GROUP BY o.indexer_address
+           GROUP BY o.indexer_address, am.indexer_address, am.indexer_url
            ORDER BY total_probes DESC"#,
     )
     .bind(&deployment_id)
@@ -471,6 +474,8 @@ pub async fn deployment_quality(
             let dp: i64 = r.get("divergent_probes");
             json!({
                 "indexer_address": r.get::<String, _>("indexer_address"),
+                "resolved_indexer": r.get::<Option<String>, _>("resolved_indexer"),
+                "indexer_url": r.get::<Option<String>, _>("indexer_url"),
                 "total_probes": tp,
                 "divergent_probes": dp,
                 "divergence_rate": if tp > 0 { dp as f64 / tp as f64 } else { 0.0 },

@@ -27,6 +27,9 @@ queries:
           block: { hash: "$block_hash" }
         ) {
           id
+          totalValueLockedUSD
+          openInterestUSD
+          txCount
         }
         tokens(
           first: 20
@@ -36,6 +39,11 @@ queries:
         ) {
           id
           symbol
+          name
+          decimals
+        }
+        _meta {
+          block { number }
         }
       }
 
@@ -48,6 +56,20 @@ queries:
           block: { hash: "$block_hash" }
         ) {
           id
+          name
+          pairName
+          strike
+          maturity
+          isCall
+          spotPrice
+          totalValueLockedUSD
+          openInterestUSD
+          longLiquidity
+          shortLiquidity
+          txCount
+        }
+        _meta {
+          block { number }
         }
       }
     entity_ids:

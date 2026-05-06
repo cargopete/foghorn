@@ -1,0 +1,60 @@
+deployment:
+  id: "0xe7b79e8051d136a6ab0ffd6016c7b7fd96dc63e220fe4071021844f36796398b"
+  ipfs_hash: "QmdwBHGxokamYsLfMVk6fXfry3Ss9emEiTy6wptd1ecysG"
+  network: "mainnet"
+  description: "Aave V2 (Ethereum Mainnet)"
+  gateway_subgraph_id: "C2zniPn45RnLDGzVeGZCx2Sw3GXrbc9gL4ZfL8B8Em2j"
+
+queries:
+  # ── Aggregate: top markets by TVL ─────────────────────────────────────────────
+  - category: Q_agg
+    template: |
+      {
+        markets(
+          first: 20
+          orderBy: totalValueLockedUSD
+          orderDirection: desc
+          block: { hash: "$block_hash" }
+        ) {
+          id
+          name
+          isActive
+          totalValueLockedUSD
+          inputTokenBalance
+          inputTokenPriceUSD
+        }
+        _meta {
+          block { number }
+        }
+      }
+
+  # ── By-ID: major Aave V2 markets (WBTC, USDC, WETH, USDT, DAI) ───────────────
+  - category: Q_byid
+    template: |
+      {
+        market(id: "$id", block: { hash: "$block_hash" }) {
+          id
+          name
+          isActive
+          totalValueLockedUSD
+          inputTokenBalance
+          inputTokenPriceUSD
+          maximumLTV
+          liquidationThreshold
+          liquidationPenalty
+        }
+        _meta {
+          block { number }
+        }
+      }
+    entity_ids:
+      # aWBTC
+      - "0x9ff58f4ffb29fa2266ab25e75e2a8b3503311656"
+      # aUSDC
+      - "0xbcca60bb61934080951369a648fb03df4f96263c"
+      # aWETH
+      - "0x030ba81f1c18d280636f32af80b9aad02cf0854e"
+      # aUSDT
+      - "0x3ed3b47dd13ec9a98b44e6204a523e766b225811"
+      # aDAI
+      - "0x028171bca77440897b824ca71d1c56cac55b68a3"

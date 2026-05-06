@@ -8,6 +8,7 @@ mod cluster;
 mod discovery;
 mod executor;
 mod freshness;
+mod resolver;
 mod scheduler;
 
 #[tokio::main]

@@ -1,0 +1,60 @@
+deployment:
+  id: "0x45c636b73728d75a77b84c782e2a44624a294c1414326e59f12d60e0a6e58f51"
+  ipfs_hash: "QmT329Bej8AwSLahmgnmi6fdYkj3rorYAcCes45gDv9aJ4"
+  network: "arbitrum-one"
+  description: "Graph Network (Arbitrum One)"
+  gateway_subgraph_id: "DZz4kDTdmzWLWsV373w2bSmoar3umKKH9y82SUKr5qmp"
+
+queries:
+  # ── Aggregate: protocol-wide stats + top indexers ────────────────────────────
+  - category: Q_agg
+    template: |
+      {
+        graphNetworks(first: 1) {
+          id
+          totalTokensStaked
+          totalDelegatedTokens
+          totalIndexingRewards
+          totalQueryFees
+          currentEpoch
+          epochLength
+        }
+        indexers(
+          first: 20
+          orderBy: stakedTokens
+          orderDirection: desc
+          block: { hash: "$block_hash" }
+        ) {
+          id
+          stakedTokens
+          allocatedTokens
+          queryFeesCollected
+          rewardsEarned
+          allocationCount
+        }
+        _meta {
+          block { number }
+        }
+      }
+
+  # ── By-ID: specific top indexers ─────────────────────────────────────────────
+  - category: Q_byid
+    template: |
+      {
+        indexer(id: "$id", block: { hash: "$block_hash" }) {
+          id
+          stakedTokens
+          allocatedTokens
+          queryFeesCollected
+          rewardsEarned
+          allocationCount
+          url
+        }
+        _meta {
+          block { number }
+        }
+      }
+    entity_ids:
+      - "0x2b3c7d1ef5fdfc0557934019c531d3e70d6200ae"
+      - "0x090f7382f9ea85c733cd501f4d87f16cb5b83ed3"
+      - "0xdc53e62df89fd07b31ed4ff886397b9e7ae4625e"
